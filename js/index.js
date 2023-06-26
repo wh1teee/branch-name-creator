@@ -18,7 +18,12 @@ const getBranchNameFromString = (string) => {
         return;
     }
 
-    return string.toLowerCase().replaceAll(' ', '-');
+    return string.toLowerCase()
+        .replace(/\[[^\]]*\]/g, '')
+        .trim()
+        .replaceAll(' ', '-')
+        .replaceAll(/-{2,}/g, '-')
+        .trim()
 };
 
 const getMissingInputError = () => {
@@ -46,6 +51,7 @@ const readClipboardFromDevTools = async (callback) => {
         });
 
         window.addEventListener("focus", () => _asyncCopyFn(callback));
+        window.addEventListener('DOMContentLoaded', () => _asyncCopyFn(callback))
     });
 };
 
@@ -53,6 +59,10 @@ const onPageInFocus = async (value) => {
     const resultBranchName = getBranchNameFromString(value);
     setResult(resultBranchName);
     await copyText(resultBranchName);
+
+    branchInput.value = value;
+    branchInput.focus();
+    branchInput.select();
 };
 
 (async () => {
